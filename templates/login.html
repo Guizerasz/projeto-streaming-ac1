@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Plataforma de Streaming</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-zinc-950 text-white flex items-center justify-center h-screen">
+    <div class="bg-zinc-900 p-8 rounded-xl shadow-2xl w-96 border border-zinc-800">
+        <h2 class="text-2xl font-bold mb-6 text-center text-purple-500">StreamHub</h2>
+        <form action="/" method="POST" class="space-y-4">
+            <div>
+                <label class="block text-sm text-zinc-400 mb-1">Usuário</label>
+                <input type="text" name="username" required class="w-full bg-zinc-950 border border-zinc-700 rounded p-2 text-white focus:outline-none focus:border-purple-500">
+            </div>
+            <div>
+                <label class="block text-sm text-zinc-400 mb-1">Senha</label>
+                <input type="password" name="password" required class="w-full bg-zinc-950 border border-zinc-700 rounded p-2 text-white focus:outline-none focus:border-purple-500">
+            </div>
+            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold p-2 rounded transition">Entrar</button>
+        </form>
+        <p class="mt-4 text-center text-sm text-zinc-400">
+            Não tem uma conta? <a href="/cadastro" class="text-purple-400 hover:underline">Cadastre-se</a>
+        </p>
+    </div>
+</body>
+</html>
