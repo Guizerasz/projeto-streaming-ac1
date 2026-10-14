@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastrar Vídeo - StreamHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-zinc-950 text-white flex items-center justify-center min-h-screen py-8">
+    <div class="bg-zinc-900 p-8 rounded-xl shadow-2xl w-full max-w-md border border-zinc-800">
+        <h2 class="text-2xl font-bold mb-6 text-center text-purple-500">Cadastrar Vídeo</h2>
+
+        <form action="/cadastrar-video" method="POST" enctype="multipart/form-data" class="space-y-4">
+            <div>
+                <label class="block text-sm text-zinc-400 mb-1">Título</label>
+                <input type="text" name="titulo" required class="w-full bg-zinc-950 border border-zinc-700 rounded p-2 text-white focus:outline-none focus:border-purple-500">
+            </div>
+            <div>
+                <label class="block text-sm text-zinc-400 mb-1">Descrição</label>
+                <textarea name="descricao" rows="3" class="w-full bg-zinc-950 border border-zinc-700 rounded p-2 text-white focus:outline-none focus:border-purple-500"></textarea>
+            </div>
+
+            <!-- Botões pra escolher entre link ou arquivo -->
+            <div class="flex gap-2 bg-zinc-950 border border-zinc-700 rounded p-1">
+                <button type="button" id="btn-link" onclick="mostrarModo('link')" class="flex-1 py-1.5 rounded text-sm font-bold transition bg-purple-600 text-white">Link</button>
+                <button type="button" id="btn-arquivo" onclick="mostrarModo('arquivo')" class="flex-1 py-1.5 rounded text-sm font-bold transition text-zinc-400">Enviar arquivo</button>
+            </div>
+
+            <div id="campo-link">
+                <label class="block text-sm text-zinc-400 mb-1">Link do vídeo (YouTube ou URL direta)</label>
+                <input type="text" name="link" id="input-link" placeholder="https://www.youtube.com/watch?v=..." class="w-full bg-zinc-950 border border-zinc-700 rounded p-2 text-white focus:outline-none focus:border-purple-500">
+            </div>
+
+            <div id="campo-arquivo" class="hidden">
+                <label class="block text-sm text-zinc-400 mb-1">Arquivo de vídeo (.mp4, .webm, .ogg, .mov)</label>
+                <input type="file" name="arquivo" id="input-arquivo" accept="video/mp4,video/webm,video/ogg,.mov" class="w-full bg-zinc-950 border border-zinc-700 rounded p-2 text-white text-sm file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-purple-600 file:text-white file:font-bold file:cursor-pointer hover:file:bg-purple-700">
+                <p class="text-xs text-zinc-500 mt-1">Tamanho máximo: 200MB</p>
+            </div>
+
+            <button type="submit" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold p-2 rounded transition">Cadastrar</button>
+        </form>
+
+        <p class="mt-4 text-center text-sm text-zinc-400">
+            <a href="/painel" class="text-purple-400 hover:underline">Voltar para o painel</a>
+        </p>
+    </div>
+
+    <script>
+        function mostrarModo(modo) {
+            const campoLink = document.getElementById('campo-link');
+            const campoArquivo = document.getElementById('campo-arquivo');
+            const btnLink = document.getElementById('btn-link');
+            const btnArquivo = document.getElementById('btn-arquivo');
+            const inputLink = document.getElementById('input-link');
+            const inputArquivo = document.getElementById('input-arquivo');
+
+            if (modo === 'link') {
+                campoLink.classList.remove('hidden');
+                campoArquivo.classList.add('hidden');
+                btnLink.classList.add('bg-purple-600', 'text-white');
+                btnLink.classList.remove('text-zinc-400');
+                btnArquivo.classList.remove('bg-purple-600', 'text-white');
+                btnArquivo.classList.add('text-zinc-400');
+                inputArquivo.value = '';
+            } else {
+                campoArquivo.classList.remove('hidden');
+                campoLink.classList.add('hidden');
+                btnArquivo.classList.add('bg-purple-600', 'text-white');
+                btnArquivo.classList.remove('text-zinc-400');
+                btnLink.classList.remove('bg-purple-600', 'text-white');
+                btnLink.classList.add('text-zinc-400');
+                inputLink.value = '';
+            }
+        }
+    </script>
+</body>
+</html>
