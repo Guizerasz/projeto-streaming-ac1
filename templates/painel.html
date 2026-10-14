@@ -5,14 +5,34 @@
     <title>Painel - StreamHub</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-zinc-950 text-white flex items-center justify-center h-screen">
-    <div class="bg-zinc-900 p-8 rounded-xl shadow-2xl w-full max-w-md border border-zinc-800 text-center">
-        <h2 class="text-2xl font-bold mb-4 text-purple-500">Bem-vindo ao StreamHub!</h2>
-        <p class="text-zinc-400 mb-6">Login realizado com sucesso.</p>
-        <div class="bg-zinc-950 p-4 rounded border border-zinc-800 mb-6 text-sm text-zinc-300">
-            Painel do usuário em desenvolvimento para a próxima AC.
+<body class="bg-zinc-950 text-white min-h-screen">
+    <header class="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
+        <h1 class="text-xl font-bold text-purple-500">StreamHub</h1>
+        <div class="flex items-center gap-4">
+            <span class="text-sm text-zinc-400">Olá, {{ username }}</span>
+            <a href="/cadastrar-video" class="bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-2 px-4 rounded transition">+ Cadastrar vídeo</a>
+            <a href="/logout" class="bg-zinc-800 hover:bg-zinc-700 text-white text-sm font-bold py-2 px-4 rounded transition">Sair</a>
         </div>
-        <a href="/" class="inline-block bg-zinc-800 hover:bg-zinc-700 text-white font-bold py-2 px-4 rounded transition">Sair / Voltar</a>
-    </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-6 py-8">
+        {% if videos|length == 0 %}
+            <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-8 text-center text-zinc-400">
+                Nenhum vídeo cadastrado ainda. Clique em "+ Cadastrar vídeo" pra adicionar o primeiro!
+            </div>
+        {% else %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% for video in videos %}
+                <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+                    {{ video.embed | safe }}
+                    <h2 class="text-lg font-bold mt-3 text-purple-400">{{ video.titulo }}</h2>
+                    {% if video.descricao %}
+                    <p class="text-sm text-zinc-400 mt-1">{{ video.descricao }}</p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </main>
 </body>
 </html>
