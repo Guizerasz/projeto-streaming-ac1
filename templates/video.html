@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ video.titulo }} - StreamHub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-zinc-950 text-white min-h-screen">
+    <header class="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
+        <a href="/painel" class="text-xl font-bold text-purple-500">StreamHub</a>
+        <div class="flex items-center gap-4">
+            <span class="text-sm text-zinc-400">Olá, {{ username }}</span>
+            <a href="/painel" class="bg-zinc-800 hover:bg-zinc-700 text-white text-sm font-bold py-2 px-4 rounded transition">Voltar</a>
+            <a href="/logout" class="bg-zinc-800 hover:bg-zinc-700 text-white text-sm font-bold py-2 px-4 rounded transition">Sair</a>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-6 py-8">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+            {{ embed | safe }}
+            <h1 class="text-2xl font-bold mt-4 text-purple-400">{{ video.titulo }}</h1>
+            <p class="text-xs text-zinc-500 mt-1">Enviado por {{ video.usuario.username }}</p>
+            {% if video.descricao %}
+            <p class="text-sm text-zinc-300 mt-3">{{ video.descricao }}</p>
+            {% endif %}
+
+            <div class="mt-4 pt-4 border-t border-zinc-800 flex items-center gap-4">
+                <button id="btn-curtir" type="button"
+                        class="flex items-center gap-2 px-4 py-2 rounded-full border border-zinc-700 text-zinc-300 hover:border-purple-500 transition">
+                    <span id="icone-curtida" class="text-lg leading-none">&#9825;</span>
+                    <span id="texto-curtida" class="text-sm font-bold">Curtir</span>
+                    <span id="total-curtidas" class="text-sm text-zinc-400">0</span>
+                </button>
+                <span class="text-sm text-zinc-400"><span id="total-comentarios">0</span> comentários</span>
+            </div>
+        </div>
+
+        <section class="mt-6 bg-zinc-900 border border-zinc-800 rounded-xl p-4">
+            <h2 class="text-lg font-bold text-purple-400 mb-3">Comentários</h2>
+
+            <form id="form-comentario" class="space-y-2">
+                <textarea id="texto-comentario" rows="3" maxlength="{{ limite }}"
+                          placeholder="Escreva um comentário..."
+                          class="w-full bg-zinc-950 border border-zinc-700 rounded p-2 text-white focus:outline-none focus:border-purple-500"></textarea>
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-zinc-500"><span id="contador-caracteres">0</span>/{{ limite }}</span>
+                    <button id="btn-comentar" type="submit"
+                            class="bg-purple-600 hover:bg-purple-700 text-white text-sm font-bold py-2 px-4 rounded transition disabled:opacity-50">
+                        Comentar
+                    </button>
+                </div>
+                <p id="erro-comentario" class="text-sm text-red-400 hidden"></p>
+            </form>
+
+            <div id="lista-comentarios" class="mt-4 space-y-3"></div>
+        </section>
+    </main>
+
+    <script>
+        const VIDEO_ID = {{ video.id }};
+        const INTERVALO_ATUALIZACAO = 4000; // busca novidades de outras pessoas a cada 4 segundos
+
+        const btnCurtir = document.getElementById('btn-curtir');
+        const iconeCurtida = document.getElementById('icone-curtida');
+        const textoCurtida = document.getElementById('texto-curtida');
+        const totalCurtidas = document.getElementById('total-curtidas');
+        const totalComentarios = document.getElementById('total-comentarios');
+        const lista = document.getElementById('lista-comentarios');
+        const form = document.getElementById('form-comentario');
+        const campo = document.getElementById('texto-comentario');
+        const contador = document.getElementById('contador-caracteres');
+        const btnComentar = document.getElementById('btn-comentar');
+        const erroComentario = document.getElementById('erro-comentario');
+
+        // Faz a chamada ao servidor. Se a sessão expirou (401), volta pro login.
+        async function chamar(url, opcoes) {
+            const resp = await fetch(url, opcoes);
+            if (resp.status === 401) {
+                window.location = '/';
+                return null;
+            }
+            const corpo = await resp.json();
+            if (!resp.ok) throw new Error(corpo.erro || 'Algo deu errado. Tente de novo.');
+            return corpo;
+        }
+
+        // Desenha curtidas e comentários na tela a partir dos dados do servidor.
+        // Os textos entram com textContent (nunca innerHTML), então ninguém consegue
+        // injetar HTML ou script através de um comentário.
+        function renderizar(dados) {
+            totalCurtidas.textContent = dados.curtidas;
+            totalComentarios.textContent = dados.comentarios.length;
+
+            iconeCurtida.innerHTML = dados.curtido ? '&#9829;' : '&#9825;';
+            textoCurtida.textContent = dados.curtido ? 'Curtido' : 'Curtir';
+            btnCurtir.classList.toggle('border-purple-500', dados.curtido);
+            btnCurtir.classList.toggle('text-purple-400', dados.curtido);
+            btnCurtir.classList.toggle('border-zinc-700', !dados.curtido);
+            btnCurtir.classList.toggle('text-zinc-300', !dados.curtido);
+
+            lista.replaceChildren();
+            if (dados.comentarios.length === 0) {
+                const vazio = document.createElement('p');
+                vazio.className = 'text-sm text-zinc-500';
+                vazio.textContent = 'Ainda não tem comentários. Seja a primeira pessoa a comentar!';
+                lista.appendChild(vazio);
+                return;
+            }
+            dados.comentarios.forEach(c => {
+                const item = document.createElement('div');
+                item.className = 'bg-zinc-950 border border-zinc-800 rounded p-3';
+
+                const topo = document.createElement('div');
+                topo.className = 'flex items-center justify-between';
+                const autor = document.createElement('span');
+                autor.className = 'text-sm font-bold text-purple-400';
+                autor.textContent = c.autor;
+                const data = document.createElement('span');
+                data.className = 'text-xs text-zinc-500';
+                data.textContent = c.data;
+                topo.append(autor, data);
+
+                const texto = document.createElement('p');
+                texto.className = 'text-sm text-zinc-200 mt-1 whitespace-pre-wrap break-words';
+                texto.textContent = c.texto;
+
+                item.append(topo, texto);
+                lista.appendChild(item);
+            });
+        }
+
+        async function atualizar() {
+            try {
+                const dados = await chamar(`/video/${VIDEO_ID}/interacoes`);
+                if (dados) renderizar(dados);
+            } catch (e) { /* falha de rede momentânea: tenta de novo no próximo ciclo */ }
+        }
+
+        btnCurtir.addEventListener('click', async () => {
+            btnCurtir.disabled = true;
+            try {
+                const dados = await chamar(`/video/${VIDEO_ID}/curtir`, { method: 'POST' });
+                if (dados) renderizar(dados);
+            } catch (e) { /* mantém a tela como estava */ }
+            btnCurtir.disabled = false;
+        });
+
+        campo.addEventListener('input', () => { contador.textContent = campo.value.length; });
+
+        form.addEventListener('submit', async (evento) => {
+            evento.preventDefault();
+            erroComentario.classList.add('hidden');
+            btnComentar.disabled = true;
+            try {
+                const dados = await chamar(`/video/${VIDEO_ID}/comentar`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ texto: campo.value }),
+                });
+                if (dados) {
+                    campo.value = '';
+                    contador.textContent = '0';
+                    renderizar(dados);
+                }
+            } catch (e) {
+                erroComentario.textContent = e.message;
+                erroComentario.classList.remove('hidden');
+            }
+            btnComentar.disabled = false;
+        });
+
+        atualizar();
+        setInterval(() => { if (!document.hidden) atualizar(); }, INTERVALO_ATUALIZACAO);
+    </script>
+</body>
+</html>

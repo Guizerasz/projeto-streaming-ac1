@@ -2,6 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Painel - StreamHub</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -25,10 +26,15 @@
                 {% for video in videos %}
                 <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4">
                     {{ video.embed | safe }}
-                    <h2 class="text-lg font-bold mt-3 text-purple-400">{{ video.titulo }}</h2>
+                    <a href="/video/{{ video.id }}" class="block text-lg font-bold mt-3 text-purple-400 hover:underline">{{ video.titulo }}</a>
+                    <p class="text-xs text-zinc-500 mt-1">por {{ video.autor }}</p>
                     {% if video.descricao %}
                     <p class="text-sm text-zinc-400 mt-1">{{ video.descricao }}</p>
                     {% endif %}
+                    <div class="flex items-center justify-between mt-3 pt-3 border-t border-zinc-800">
+                        <span class="text-sm text-zinc-400">&#9829; {{ video.curtidas }} &middot; {{ video.comentarios }} comentários</span>
+                        <a href="/video/{{ video.id }}" class="bg-zinc-800 hover:bg-zinc-700 text-white text-sm font-bold py-1.5 px-3 rounded transition">Abrir e comentar</a>
+                    </div>
                 </div>
                 {% endfor %}
             </div>
