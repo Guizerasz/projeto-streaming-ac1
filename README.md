@@ -1,13 +1,25 @@
 # StreamHub — Plataforma de Streaming (Projeto Acadêmico)
 
-Aplicação web de autenticação (cadastro e login) para uma plataforma de streaming fictícia, desenvolvida em Python com Flask.
+Plataforma de streaming fictícia desenvolvida em Python com Flask. Os usuários criam conta, publicam vídeos (por link do YouTube ou enviando um arquivo) e interagem com eles por curtidas e comentários.
 
 ## Funcionalidades
 
-- Cadastro de novos usuários
-- Login com verificação de credenciais
-- Armazenamento seguro de senhas (hash via Werkzeug, não texto puro)
-- Painel inicial exibido após o login
+**Usuários (AC1)**
+- Cadastro de novos usuários, com aviso quando o nome já existe
+- Login com sessão (o sistema sabe quem está logado) e logout
+- Senhas armazenadas com hash (Werkzeug), nunca em texto puro
+
+**Vídeos (AC2)**
+- Cadastro de vídeo com título, descrição e link do YouTube ou arquivo enviado do computador (.mp4, .webm, .ogg, .mov)
+- Reconhecimento automático de links do YouTube, com player embutido
+- Listagem dos vídeos no painel, do mais novo para o mais antigo
+
+**Interação (AC3)**
+- Página própria para cada vídeo
+- Curtir e descurtir (uma curtida por usuário em cada vídeo)
+- Comentários de até 300 caracteres, com autor e data
+- Atualização sem recarregar a página: o que a própria pessoa faz aparece na hora, e curtidas e comentários de outras pessoas aparecem sozinhos em poucos segundos
+- Total de curtidas e comentários em cada card do painel
 
 ## Tecnologias utilizadas
 
@@ -15,6 +27,7 @@ Aplicação web de autenticação (cadastro e login) para uma plataforma de stre
 - Flask
 - Flask-SQLAlchemy
 - SQLite
+- JavaScript (fetch) para as atualizações em tempo real
 - Tailwind CSS (via CDN)
 
 ## Como rodar o projeto localmente
@@ -53,17 +66,17 @@ projeto_streaming/
 ├── templates/
 │   ├── login.html
 │   ├── cadastro.html
-│   └── painel.html
+│   ├── painel.html
+│   ├── cadastro_video.html
+│   └── video.html
+├── static/
+│   └── videos/           (vídeos enviados, ignorados pelo git)
 └── instance/
-    └── database.db   (gerado automaticamente, ignorado pelo git)
+    └── database.db       (gerado automaticamente, ignorado pelo git)
 ```
 
 ## Melhorias futuras
 
-- Sessão de login persistente (Flask session)
-- Painel de usuário completo
+- Editar e excluir vídeos cadastrados
+- Excluir os próprios comentários
 - Validação adicional de formulários no backend
-
-## Autor
-
-Guilherme
