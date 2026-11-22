@@ -97,8 +97,8 @@ projeto_streaming/
 
 ## Diagramas
 
-- [Diagrama de classes](docs/diagramas/diagrama_de_classes.png)
-- [Diagrama de casos de uso](docs/diagramas/diagrama_de_casos_de_uso.png)
+- [Diagrama de classes](diagrama_de_classes.png)
+- [Diagrama de casos de uso](diagrama_de_casos_de_uso.png)
 
 ## Melhorias futuras
 
