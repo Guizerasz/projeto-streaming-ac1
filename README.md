@@ -1,12 +1,12 @@
 # StreamHub — Plataforma de Streaming (Projeto Acadêmico)
 
-Plataforma de streaming fictícia desenvolvida em Python com Flask. Os usuários criam conta, publicam vídeos (por link do YouTube ou enviando um arquivo) e interagem com eles por curtidas e comentários.
+Plataforma de streaming fictícia desenvolvida em Python com Flask. Os usuários criam conta, publicam vídeos (por link do YouTube ou enviando um arquivo), interagem por curtidas e comentários e têm uma página de perfil com os próprios vídeos.
 
 ## Funcionalidades
 
 **Usuários (AC1)**
-- Cadastro de novos usuários, com aviso quando o nome já existe
-- Login com sessão (o sistema sabe quem está logado) e logout
+- Cadastro de novos usuários, com validação (usuário de 3 a 30 caracteres, senha de 6 a 128) e aviso quando o nome já existe
+- Login com sessão e logout
 - Senhas armazenadas com hash (Werkzeug), nunca em texto puro
 
 **Vídeos (AC2)**
@@ -18,8 +18,15 @@ Plataforma de streaming fictícia desenvolvida em Python com Flask. Os usuários
 - Página própria para cada vídeo
 - Curtir e descurtir (uma curtida por usuário em cada vídeo)
 - Comentários de até 300 caracteres, com autor e data
-- Atualização sem recarregar a página: o que a própria pessoa faz aparece na hora, e curtidas e comentários de outras pessoas aparecem sozinhos em poucos segundos
-- Total de curtidas e comentários em cada card do painel
+- Atualização sem recarregar a página (curtidas e comentários de outras pessoas aparecem sozinhos em poucos segundos)
+
+**Versão final (prova)**
+- **Editar e excluir vídeos** — só o autor pode; ao excluir, os comentários, as curtidas e o arquivo enviado também são apagados
+- **Excluir os próprios comentários** — o botão só aparece para o autor do comentário
+- **Página de perfil** — "Meus vídeos" com total de vídeos, curtidas recebidas e comentários feitos; também dá para ver o perfil de outros usuários
+- **Validações no backend** — tamanhos, link http/https, formato de arquivo e limite de upload (200MB)
+- **Mensagens amigáveis** (sucesso e erro) no lugar de alert() e telas de erro
+- **Segurança** — chave secreta fora do código, modo debug desligado por padrão, proteção contra HTML/script injetado em títulos, descrições e comentários
 
 ## Tecnologias utilizadas
 
@@ -27,7 +34,7 @@ Plataforma de streaming fictícia desenvolvida em Python com Flask. Os usuários
 - Flask
 - Flask-SQLAlchemy
 - SQLite
-- JavaScript (fetch) para as atualizações em tempo real
+- JavaScript (fetch) para as atualizações sem recarregar
 - Tailwind CSS (via CDN)
 
 ## Como rodar o projeto localmente
@@ -56,27 +63,45 @@ Plataforma de streaming fictícia desenvolvida em Python com Flask. Os usuários
 
 5. Acesse no navegador: http://127.0.0.1:5000
 
+### Configurações opcionais
+
+- **SECRET_KEY** — se a variável de ambiente não existir, o app cria sozinho a chave em `instance/secret_key.txt` (ignorada pelo git).
+- **FLASK_DEBUG=1** — liga o modo debug, só para desenvolvimento (por padrão fica desligado).
+
 ## Estrutura do projeto
 
 ```
 projeto_streaming/
 ├── app.py
 ├── requirements.txt
+├── README.md
 ├── .gitignore
 ├── templates/
+│   ├── _cabecalho.html        (partes reaproveitadas)
+│   ├── _card_video.html
+│   ├── _mensagens.html
 │   ├── login.html
 │   ├── cadastro.html
 │   ├── painel.html
+│   ├── perfil.html
 │   ├── cadastro_video.html
-│   └── video.html
+│   ├── editar_video.html
+│   ├── video.html
+│   └── erro.html
 ├── static/
-│   └── videos/           (vídeos enviados, ignorados pelo git)
-└── instance/
-    └── database.db       (gerado automaticamente, ignorado pelo git)
+│   └── videos/                (vídeos enviados, ignorados pelo git)
+├── docs/
+│   └── diagramas/             (diagrama de classes e de casos de uso)
+└── instance/                  (banco e chave secreta, gerados e ignorados pelo git)
 ```
+
+## Diagramas
+
+- [Diagrama de classes](docs/diagramas/diagrama_de_classes.png)
+- [Diagrama de casos de uso](docs/diagramas/diagrama_de_casos_de_uso.png)
 
 ## Melhorias futuras
 
-- Editar e excluir vídeos cadastrados
-- Excluir os próprios comentários
-- Validação adicional de formulários no backend
+- Busca de vídeos e categorias
+- Trocar o arquivo de um vídeo já enviado
+- Foto de perfil
